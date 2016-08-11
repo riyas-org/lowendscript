@@ -113,23 +113,24 @@ function install_exim4 {
 }
 
 function install_mysql {
-    # Install the MySQL packages
-    check_install mysqld mysql-server
-    check_install mysql mysql-client
+# Install the MySQL packages
+check_install mysqld mysql-server
+check_install mysql mysql-client
 
-    # Install a low-end copy of the my.cnf to disable InnoDB, and then delete
-    # all the related files.
-    invoke-rc.d mysql stop
-    rm -f /var/lib/mysql/ib*
-    cat > /etc/mysql/conf.d/lowendbox.cnf <<END
+# Install a low-end copy of the my.cnf to disable InnoDB, and then delete
+# all the related files.
+invoke-rc.d mysql stop
+rm -f /var/lib/mysql/ib*
+cat > /etc/mysql/conf.d/lowendbox.cnf <<END
 [mysqld]
 key_buffer = 8M
 query_cache_size = 0
 skip-innodb
+default-storage-engine = myisam
 END
-    invoke-rc.d mysql start
+invoke-rc.d mysql start
 
-    # Generating a new password for the root user.
+# Generating a new password for the root user.
     passwd=`get_password root@mysql`
     mysqladmin password "$passwd"
     cat > ~/.my.cnf <<END
